@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-         WEBSERVER = "Nginx" //INICIALIZA LA VARIABLE CON EL VALOR "Nginx"
+         WEBSERVER = "Apache" //INICIALIZA LA VARIABLE CON EL VALOR "Nginx"
     }
     stages {
         
