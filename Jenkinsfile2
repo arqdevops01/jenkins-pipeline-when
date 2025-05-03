@@ -6,24 +6,12 @@ pipeline {
     }
        
     stages {
-        stage('Create  directory for the WEB Application')
-        {
-            when { 
-                equals(actual: currentBuild.number, expected: 1)
-            }
-            steps{
-               
-                //Fisrt, drop the directory if exists
-                sh 'rm -rf /home/jenkins/app-web'
-                //Create the directory
-                sh 'mkdir /home/jenkins/app-web'
-                
-            }
-        }
+        
         stage('Drop the container'){   
             
             steps {
             echo 'droping the container...'
+            sh 'docker stop app-web'
             sh 'docker rm -f app-web'
             }
         }
@@ -31,14 +19,14 @@ pipeline {
         // Apache Webserver in Development
         stage('Create the Apache container in Development') {
              when {
-                allOf {           
+                allOf {           //allof permite colocar maś condiciones que es por defecto.
                  environment name: 'WEBSERVER', value: 'Apache'
                  environment name: 'ENV', value: 'Development'                
                 }
              }
             steps {
             echo 'Creating the container...'
-            sh 'docker run -dit --name app-web -p 9100:80  -v /home/jenkins/app-web:/usr/local/apache2/htdocs/ httpd'
+            sh 'docker run -dit --name app-web -p 9100:80  -v /home/developer/app-web:/usr/local/apache2/htdocs/ httpd'
             }
         }
         //Nginx webserver in Test
@@ -51,7 +39,7 @@ pipeline {
              }
             steps {
             echo 'Creating the container...'
-            sh 'docker run -dit --name app-web -p 9100:80  -v /home/jenkins/app-web:/usr/share/nginx/html nginx'
+            sh 'docker run -dit --name app-web -p 9100:80  -v /home/developer/app-web:/usr/share/nginx/html nginx'
          
             }
         }
@@ -65,7 +53,7 @@ pipeline {
              }
             steps {
             echo 'Creating the container...'
-            sh 'docker run -dit --name app-web -p 9100:80  -v /home/jenkins/app-web:/usr/share/nginx/html nginx'
+            sh 'docker run -dit --name app-web -p 9100:80  -v /home/developer/app-web:/usr/share/nginx/html nginx'
          
             }
         }
@@ -102,13 +90,7 @@ pipeline {
             }
         }
 
-        //Copy the application   
-        stage('Copy the web application to the container directory') {
-            steps {
-                echo 'Copying web application...'             
-                sh 'cp -r web/* /home/jenkins/app-web'
-            }
-        }
+        
     }
 
     post {
