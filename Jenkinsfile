@@ -2,20 +2,10 @@ pipeline {
     agent any
     
     environment {
-         WEBSERVER = "Nginx"
+         WEBSERVER = "Nginx" //INICIALIZA LA VARIABLE CON EL VALOR "Nginx"
     }
     stages {
-        stage('Create  directory for the WEB Application')
-        {
-            steps{
-               
-                //Fisrt, drop the directory if exists
-                sh 'rm -rf /home/jenkins/app-web'
-                //Create the directory
-                sh 'mkdir /home/jenkins/app-web'
-                
-            }
-        }
+        
         stage('Drop the container'){
             steps {
             echo 'droping the container...'
@@ -29,7 +19,7 @@ pipeline {
             }
             steps {
             echo 'Creating the container...'
-            sh 'docker run -dit --name app-web -p 9100:80  -v /home/jenkins/app-web:/usr/local/apache2/htdocs/ httpd'
+            sh 'docker run -dit --name app-web -p 9100:80  -v /home/developer/app-web:/usr/local/apache2/htdocs/ httpd'
             }
         }
         //Nginx webserver
@@ -39,18 +29,11 @@ pipeline {
             }
             steps {
             echo 'Creating the container...'
-            sh 'docker run -dit --name app-web -p 9100:80  -v /home/jenkins/app-web:/usr/share/nginx/html nginx'
+            sh 'docker run -dit --name app-web -p 9100:80  -v /home/developer/app-web:/usr/share/nginx/html nginx'
          
             }
         }
-
-        
-        stage('Copy the web application to the container directory') {
-            steps {
-                echo 'Copying web application...'             
-                sh 'cp -r web/* /home/jenkins/app-web'
-            }
-        }
+                
     }
 
     post {
